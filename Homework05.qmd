@@ -4,6 +4,16 @@ author: "Brock Akerman"
 format: html
 ---
 
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(caret)
+library(class)
+library(tree)
+library(rpart)
+library(gbm)
+library(randomForest)
+```
+
 
 ## Task 1: Conceptual Questions
 
@@ -11,23 +21,101 @@ On the exam, you’ll be asked to explain some topics. How about some practice?!
 with the following questions:
 
 **1. What is the purpose of using cross-validation when fitting a random forest model?**\
+
+The purpose of cross-validating a random forest model is to evaluate its performance.  We would be interested in analyzing overfittedness and precision. 
+
 **2. Describe the bagged tree algorithm.**\
+
+The bagged-tree algorithm works by taking repeated samples of a data set.  A parameter is taken from each sample.  A distribution is derived from that collection of sampled parameters and the theory is that we can obtain an estimator from that distribution of estimators that will explain the data. 
+
 **3. What is meant by a general linear model?**\
+
+A general linear model describes a rigid transactional relationship between a dependent and independent variable that can be expressed linearly; one observation to one outcome at various points along the data.  
+
 **4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?**\
+
+The interaction term accounts for a relationship between two independent variables.  Adding an interaction term to a model can either be informative or not helpful at all.  It can be helpful in terms of explaining how two variables have effects on each other and not simply a relationship that is additive (i.e. not simply adding $\beta_0 + \beta_1X_1 + \beta_2X_2$; rather $\beta_0 + \beta_1X_1 + \beta_2X_2 + \beta_3X_1X_2$).  There exists scenarios where this can be harmful to modeling.  If we were to add an interaction term that had no significance, likely it would not contribute any new information to explaining the variables in the model _and_ at the cost of degrees of freedom which we require for statistical inference.
+
 **5. Why do we split our data into a training and test set?**\
+
+A training set is the data we use to train a model while the test set is used to evaluate the model.  The test set uses unseen data which acts as a unbiased-filter and we use that to estimate how well the model in the training set is performing. 
 
 ## Task 2: Fitting Models
 *We’ll use the data set called heart.csv available here. This data set gives information about whether or not someone has heart disease (HeartDisease = 1 or = 0) along with different measurements about that person’s health. The data comes from here if you’d like to read a bit more about it.*\
 
 ##### Quick EDA/Data Preparation
 *1. Quickly understand your data.* **Check on missingness and summarize the data, especially with respect to the relationships of the variables to HeartDisease.**\
+
+```{r}
+#Import Data 
+heart_data_unedited <- read.csv("heart.csv")
+
+#Convert data to Tibble
+heart_data <- as_tibble(heart_data_unedited)
+
+#Check Data for missing values
+colSums(is.na(heart_data))
+
+#Summarize data wrt HeartDisease; nested many of the numerical data points into the summarise function and called on min, max, mean, and sd.  I performed a round on any value that had a 100th place decimal or smaller and called on glimpse to display all values.  
+heart_data_summary <- heart_data |>
+  group_by(HeartDisease) |>
+  summarise(
+    HeartDiseaseCount = n(), 
+    min_age = min(Age, na.rm = TRUE),
+    average_age = round(mean(Age, na.rm = TRUE),1),
+    max_age = max(Age, na.rm = TRUE),
+    sd_age = round(sd(Age, na.rm = TRUE),1),
+    min_RestingBP = min(RestingBP, na.rm = TRUE),
+    averRestingBP_RestingBP = round(mean(RestingBP, na.rm = TRUE),1),
+    max_RestingBP = max(RestingBP, na.rm = TRUE),
+    sd_RestingBP = round(sd(RestingBP, na.rm = TRUE),1),
+    min_Cholesterol = min(Cholesterol, na.rm = TRUE),
+    averCholesterol_Cholesterol = round(mean(Cholesterol, na.rm = TRUE),1),
+    max_Cholesterol = max(Cholesterol, na.rm = TRUE),
+    sd_Cholesterol = round(sd(Cholesterol, na.rm = TRUE),1))
+glimpse(heart_data_summary)
+
+```
+
 **2. Create a new variable that is a factor version of the HeartDisease variable (if needed, this depends on how you read in your data). Remove the ST_Slope variable and the original HeartDisease variable (if applicable).**\
+
+```{r}
+#Got rid of Cholesterol values that were not possible (tipped off from the message boards), set HeartDisease as a factor and replaced the existing column with the factorized one, and finally removed ST_Slope from the tibble. 
+heart_data <- heart_data |>
+  filter(Cholesterol > 0) |>
+  mutate(HeartDisease = as.factor(HeartDisease)) %>%
+  select(-ST_Slope)
+print(heart_data)
+```
 *3. We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors (although we could try to create our own loss function as an alternative). In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina ChestPainType, and RestingECG.*\
 **Create dummy columns corresponding to the values of these three variables for use in our kNN fit.** *The caret vignette has a function to help us out here. You should use dummyVars() and predict() to create new columns. Then* **add these columns to our data frame.**\
+
+```{r}
+#Created a dummy object `dmy` with the columns that I want to "dummify".
+dmy <- dummyVars("~ Sex + ChestPainType + RestingECG + ExerciseAngina", heart_data)
+#Create a predict_heartdata object to hold the predicted dmy values for adding to the main tibble. 
+pred_hd <- predict(dmy, heart_data)
+
+#Adding the predicted values to the table while removed their non-predictive variants. 
+heart_data <- bind_cols(
+  heart_data %>%
+    select(-Sex, -ExerciseAngina, -ChestPainType, -RestingECG), pred_hd)
+print(heart_data)
+```
+
 
 ## Split your Data
 
 **Split your data into a training and test set.** *(Ideally you’d do this prior to the EDA so that info from the EDA doesn’t bias what you do modeling-wise, but that isn’t usually done.)*\
+
+```{r}
+#Reproducibility.
+set.seed(1234)
+#Split on HeartDisease, by 70:30 ratio. Object name describes which split is which. 
+heart_split <- createDataPartition(heart_data$HeartDisease, p = 0.7, list = FALSE)
+heart_train <- heart_data[heart_split, ]
+heart_test <- heart_data[-heart_split, ]
+```
 
 ## kNN
 
@@ -39,14 +127,118 @@ with the following questions:
 
 **Train the kNN model.** *Use repeated 10 fold cross-validation, with the number of repeats being 3. You should also preprocess the data by centering and scaling. When fitting the model, set the tuneGrid so that you are considering values of k of 1, 2, 3, . . . , 40. (Note: From the help for the train() function it says: tuneGrid A data frame with possible tuning values. The columns are named the same as the tuning parameters. The name of the tuning parameter here is k.)*\
 
+```{r}
+#built-in caret function to control the training computations.  Ten-Fold cross validation is used with three repeats. 
+trainCTRL <- trainControl(method = "repeatedcv", number = 10, repeats = 3);
+
+#hyperparameter Tuning 
+tuneGrid <- expand.grid(k = 1:40)
+
+#The substance of the kNN model with reproducibility and center/scaling. 
+set.seed(1234)
+heartData_knn_model <- train(
+  HeartDisease ~ Age + Cholesterol,
+  heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+print(heartData_knn_model)
+```
+
 **Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.**\
+
+```{r}
+heart_test_predictions <- predict(heartData_knn_model, newdata = heart_test)
+ConfMtrx <- confusionMatrix(heart_test_predictions, heart_test$HeartDisease)
+ConfMtrx
+```
+
+Mainly interested in the accuracy = 0.6143. That is from the reference matrix (73 + 64)/223.  The diagonal divided by the sum of the entire matrix.
 
 ## Logistic Regression
 
-**Using your EDA, posit three different logistic regression models.** *Note: You don’t have to use the dummy columns you made here as the glm() function (and the caret implementation of it) can handle factor/character variables as predictors.*\
+**Using your EDA, posit three different logistic regression models.** *Note: You don’t have to use the dummy columns you made here as the glm() function (and the caret implementation of it) can handle factor/character variables as predictors.*\
+
+```{r}
+#Model with the non-binary variables
+model1 <- HeartDisease ~ Age + SexF + SexM + Cholesterol + RestingBP
+
+#Model with some non-binary variables thrown together
+model2 <- HeartDisease ~ Age + SexF + SexM + Cholesterol + ExerciseAnginaN + ExerciseAnginaY + FastingBS
+
+#Model using all variables
+model3 <- HeartDisease ~ .
+```
+
 **Fit those models on the training set, using repeated CV as done above.** *You can preprocess the data or not, up to you.*\
+
+```{r}
+set.seed(1234)
+model1_train <- train(
+  model1,
+  heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+
+set.seed(1234)
+model2_train <- train(
+  model2,
+  heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+
+set.seed(1234)
+model3_train <- train(
+  model3,
+  heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+```
+
+```{r}
+# Extract resamples into a list
+results <- resamples(list(model1 = model1_train, model2 = model2_train, model3 = model3_train))
+print(results)
+```
+
 **Identify your best model and provide a basic summary of it.**\
+
+```{r}
+# Summarize the results
+results_summary <- summary(results)
+print(results_summary)
+```
+
 **Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.**\
+
+```{r}
+# Extract accuracies
+model_accuracies <- results_summary$statistics$Accuracy[, "Mean"]
+
+# Identify the best model
+best_model_name <- names(which.max(model_accuracies))
+print(paste("Best model:", best_model_name))
+
+# Retrieve the best model
+best_model_train <- get(paste0(best_model_name, "_train"))
+print(best_model_train)
+
+# Evaluate the best model on the test set
+predictions <- predict(best_model_train, newdata = heart_test)
+conf_matrix <- confusionMatrix(predictions, heart_test$HeartDisease)
+print(conf_matrix)
+```
 
 ## Tree Models
 
@@ -54,12 +246,178 @@ with the following questions:
 
 **Choose your own variables of interest (as with logistic regression, this models can accept factor/character variables as predictors). Use repeated 10 fold CV to select a best:**
 
+```{r}
+#I was not sure if we were supposed to choose the best model from earlier, one of the other models from earlier or select a new sets of independent variables hypothesized to explain most of what makes up this model; so I chose to assume the . 
+model4 <- HeartDisease ~ Age + SexF + SexM + Cholesterol + RestingBP
+model5 <- HeartDisease ~ FastingBS + ChestPainTypeATA + ChestPainTypeNAP + ChestPainTypeASY + ChestPainTypeTA
+model6 <- HeartDisease ~ RestingECGNormal + RestingECGST + RestingECGLVH + Cholesterol
+
+#built-in caret function to control the training computations.  Ten-Fold cross validation is used with three repeats. 
+trainCTRL <- trainControl(method = "repeatedcv", number = 10, repeats = 3);
+
+#hyperparameter Tuning 
+tuneGrid <- expand.grid(k = 1:40)
+
+#Using the trainCTRL and tuneGrid objects to replicate the same environment to training model4 as I did model1-model3.
+set.seed(1234)
+model4_train <- train(
+  model4,
+  data = heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+
+set.seed(1234)
+model5_train <- train(
+  model5,
+  data = heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+
+set.seed(1234)
+model6_train <- train(
+  model6,
+  data = heart_train, 
+  method = "knn",
+  trControl = trainCTRL,
+  tuneGrid = tuneGrid,
+  preProcess = c("center", "scale")
+)
+
+# Extract samples from models 4,5 and 6 and add them to the existing list of models sampled. 
+results <- resamples(list(model4 = model4_train, model5 = model5_train, model6 = model6_train))
+
+# Summarize the results
+results_summary <- summary(results)
+
+# Extract accuracies
+model_accuracies <- results_summary$statistics$Accuracy[, "Mean"]
+
+# Identify the best model
+best_model_name <- names(which.max(model_accuracies))
+print(paste("Best model:", best_model_name))
+
+# Retrieve the best model
+best_model_train <- get(paste0(best_model_name, "_train"))
+print(best_model_train)
+
+# Evaluate the best model on the test set
+predictions <- predict(best_model_train, newdata = heart_test)
+conf_matrix <- confusionMatrix(predictions, heart_test$HeartDisease)
+print(conf_matrix)
+```
+
+Based on the results we are still going to move forward with Model #5 as the best model to use for the subsequent tree modeling.  
+
 **• classification tree model** *(use method = rpart: tuning parameter is cp, use values 0, 0.001, 0.002, . . . ,0.1)*\
+
+```{r}
+#Using the example in the slides as a resource, I used the original heart_data to fitTree.  Was not sure we were supposed to use the best model from earlier.  Noticed that the slides used the original dataset and not the modeling sets.  Apologies, this section was a little more confusing for me than earlier assignments. 
+
+#This handles the intructions of method and tuning parameter to be used in the training
+tuneGridClass <- expand.grid(cp = seq(0, 0.1, by = 0.001))
+
+#training the model
+set.seed(1234)
+classification_tree <- train(
+  model5,
+  data = heart_train,
+  method = "rpart",
+  trControl = trainCTRL,
+  tuneGrid = tuneGridClass,
+  preProcess = c("center", "scale")
+)
+print(classification_tree)
+```
+
 **• a random forest** *(use method = rf: tuning parameter is mtry, use values of 1, 2, . . . , # of predictors (bagging is a special case here!)*\
+
+```{r}
+# Set up empty var for tuning.
+num_predictors <- length(all.vars(model5)) - 1  
+
+# New Tuning for this tree fit
+tuneGridRando <- expand.grid(mtry = 1:num_predictors)
+
+set.seed(1234)
+random_forest <- train(
+  model5,
+  data = heart_train,
+  method = "rf",
+  trControl = trainCTRL,
+  tuneGrid = tuneGridRando,
+  preProcess = c("center", "scale")
+)
+print(random_forest)
+
+```
+
 **• a boosted tree** *(use method = gbm: tuning parameters are n.trees, interaction.depth, shrinkage, and n.minobsinnode, use all combinations of n.trees of 25, 50, 100, and 200, interaction.depth of 1, 2, 3, shrinkage = 0.1, and nminobsinnode = 10; Hint: use expand.grid() to create your data frame for tuneGrid and verbose = FALSE limits the output produced.*\
 
-**Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function.**\
+```{r}
+# Define the train control for cross-validation
+trainCTRL <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
 
+# Define the tuning grid for the boosted tree
+tuneGridBoosted <- expand.grid(
+  n.trees = c(25, 50, 100, 200),
+  interaction.depth = c(1, 2, 3),
+  shrinkage = 0.1,
+  n.minobsinnode = 10
+)
+
+
+# Train the boosted tree model using caret
+set.seed(1234)
+boosted_tree <- train(
+  model5,
+  data = heart_train,
+  method = "gbm",
+  trControl = trainCTRL,
+  tuneGrid = tuneGridBoosted,
+  preProcess = c("center", "scale"),
+  verbose = FALSE
+)
+# Print the model summary to check the best parameters
+print(boosted_tree)
+```
+
+**Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function**\
+
+```{r}
+# Test set predictions
+pred_tree <- predict(classification_tree, newdata = heart_test)
+pred_rf <- predict(random_forest, newdata = heart_test)
+pred_boosted <- predict(boosted_tree, newdata = heart_test)
+
+# Confusion matrices
+conf_matrix_tree <- confusionMatrix(pred_tree, heart_test$HeartDisease); print(conf_matrix_tree)
+conf_matrix_rf <- confusionMatrix(pred_rf, heart_test$HeartDisease); print(conf_matrix_rf)
+conf_matrix_boosted <- confusionMatrix(pred_boosted, heart_test$HeartDisease); print(conf_matrix_boosted)
+
+```
 ## Wrap up
 
 **Which model overall did the best job (in terms of accuracy) on the test set?**\
+
+```{r}
+# Extract balanced accuracy from each confusion matrix
+balanced_accuracy_tree <- conf_matrix_tree$byClass[11]
+balanced_accuracy_rf <- conf_matrix_rf$byClass[11]
+balanced_accuracy_boosted <- conf_matrix_boosted$byClass[11]
+
+# Create a data frame to summarize the results
+balanced_accuracy_summary <- data.frame(
+  Model = c("Classification Tree", "Random Forest", "Boosted Tree"),
+  Balanced_Accuracy = c(balanced_accuracy_tree, balanced_accuracy_rf, balanced_accuracy_boosted)
+)
+
+# Print the summary data frame
+print(balanced_accuracy_summary)
+```
+On accuracy alone the classification tree model for model5 outperformed the boosted tree and the random forest tree.  

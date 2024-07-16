@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -35,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
 <link href="Homework05_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="Homework05_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -69,15 +132,33 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(class)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tree)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gbm)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <section id="task-1-conceptual-questions" class="level2">
 <h2 class="anchored" data-anchor-id="task-1-conceptual-questions">Task 1: Conceptual Questions</h2>
 <p>On the exam, you’ll be asked to explain some topics. How about some practice?! Create a markdown list with the following questions:</p>
 <p><strong>1. What is the purpose of using cross-validation when fitting a random forest model?</strong><br>
-<strong>2. Describe the bagged tree algorithm.</strong><br>
-<strong>3. What is meant by a general linear model?</strong><br>
-<strong>4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?</strong><br>
-<strong>5. Why do we split our data into a training and test set?</strong><br>
 </p>
+<p>The purpose of cross-validating a random forest model is to evaluate its performance. We would be interested in analyzing overfittedness and precision.</p>
+<p><strong>2. Describe the bagged tree algorithm.</strong><br>
+</p>
+<p>The bagged-tree algorithm works by taking repeated samples of a data set. A parameter is taken from each sample. A distribution is derived from that collection of sampled parameters and the theory is that we can obtain an estimator from that distribution of estimators that will explain the data.</p>
+<p><strong>3. What is meant by a general linear model?</strong><br>
+</p>
+<p>A general linear model describes a rigid transactional relationship between a dependent and independent variable that can be expressed linearly; one observation to one outcome at various points along the data.</p>
+<p><strong>4. When fitting a multiple linear regression model, what does adding an interaction term do? That is, what does it allow the model to do differently as compared to when it is not included in the model?</strong><br>
+</p>
+<p>The interaction term accounts for a relationship between two independent variables. Adding an interaction term to a model can either be informative or not helpful at all. It can be helpful in terms of explaining how two variables have effects on each other and not simply a relationship that is additive (i.e.&nbsp;not simply adding <span class="math inline">\(\beta_0 + \beta_1X_1 + \beta_2X_2\)</span>; rather <span class="math inline">\(\beta_0 + \beta_1X_1 + \beta_2X_2 + \beta_3X_1X_2\)</span>). There exists scenarios where this can be harmful to modeling. If we were to add an interaction term that had no significance, likely it would not contribute any new information to explaining the variables in the model <em>and</em> at the cost of degrees of freedom which we require for statistical inference.</p>
+<p><strong>5. Why do we split our data into a training and test set?</strong><br>
+</p>
+<p>A training set is the data we use to train a model while the test set is used to evaluate the model. The test set uses unseen data which acts as a unbiased-filter and we use that to estimate how well the model in the training set is performing.</p>
 </section>
 <section id="task-2-fitting-models" class="level2">
 <h2 class="anchored" data-anchor-id="task-2-fitting-models">Task 2: Fitting Models</h2>
@@ -86,16 +167,137 @@ ul.task-list li input[type="checkbox"] {
 <section id="quick-edadata-preparation" class="level5">
 <h5 class="anchored" data-anchor-id="quick-edadata-preparation">Quick EDA/Data Preparation</h5>
 <p><em>1. Quickly understand your data.</em> <strong>Check on missingness and summarize the data, especially with respect to the relationships of the variables to HeartDisease.</strong><br>
-<strong>2. Create a new variable that is a factor version of the HeartDisease variable (if needed, this depends on how you read in your data). Remove the ST_Slope variable and the original HeartDisease variable (if applicable).</strong><br>
-<em>3. We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors (although we could try to create our own loss function as an alternative). In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina ChestPainType, and RestingECG.</em><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Import Data </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>heart_data_unedited <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"heart.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Convert data to Tibble</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>heart_data <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(heart_data_unedited)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Check Data for missing values</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(heart_data))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Age            Sex  ChestPainType      RestingBP    Cholesterol 
+             0              0              0              0              0 
+     FastingBS     RestingECG          MaxHR ExerciseAngina        Oldpeak 
+             0              0              0              0              0 
+      ST_Slope   HeartDisease 
+             0              0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Summarize data wrt HeartDisease; nested many of the numerical data points into the summarise function and called on min, max, mean, and sd.  I performed a round on any value that had a 100th place decimal or smaller and called on glimpse to display all values.  </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>heart_data_summary <span class="ot">&lt;-</span> heart_data <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(HeartDisease) <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">HeartDiseaseCount =</span> <span class="fu">n</span>(), </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_age =</span> <span class="fu">min</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">average_age =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_age =</span> <span class="fu">max</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_age =</span> <span class="fu">round</span>(<span class="fu">sd</span>(Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_RestingBP =</span> <span class="fu">min</span>(RestingBP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">averRestingBP_RestingBP =</span> <span class="fu">round</span>(<span class="fu">mean</span>(RestingBP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_RestingBP =</span> <span class="fu">max</span>(RestingBP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_RestingBP =</span> <span class="fu">round</span>(<span class="fu">sd</span>(RestingBP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_Cholesterol =</span> <span class="fu">min</span>(Cholesterol, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">averCholesterol_Cholesterol =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Cholesterol, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_Cholesterol =</span> <span class="fu">max</span>(Cholesterol, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_Cholesterol =</span> <span class="fu">round</span>(<span class="fu">sd</span>(Cholesterol, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),<span class="dv">1</span>))</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(heart_data_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 2
+Columns: 14
+$ HeartDisease                &lt;int&gt; 0, 1
+$ HeartDiseaseCount           &lt;int&gt; 410, 508
+$ min_age                     &lt;int&gt; 28, 31
+$ average_age                 &lt;dbl&gt; 50.6, 55.9
+$ max_age                     &lt;int&gt; 76, 77
+$ sd_age                      &lt;dbl&gt; 9.4, 8.7
+$ min_RestingBP               &lt;int&gt; 80, 0
+$ averRestingBP_RestingBP     &lt;dbl&gt; 130.2, 134.2
+$ max_RestingBP               &lt;int&gt; 190, 200
+$ sd_RestingBP                &lt;dbl&gt; 16.5, 19.8
+$ min_Cholesterol             &lt;int&gt; 0, 0
+$ averCholesterol_Cholesterol &lt;dbl&gt; 227.1, 175.9
+$ max_Cholesterol             &lt;int&gt; 564, 603
+$ sd_Cholesterol              &lt;dbl&gt; 74.6, 126.4</code></pre>
+</div>
+</div>
+<p><strong>2. Create a new variable that is a factor version of the HeartDisease variable (if needed, this depends on how you read in your data). Remove the ST_Slope variable and the original HeartDisease variable (if applicable).</strong><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Got rid of Cholesterol values that were not possible (tipped off from the message boards), set HeartDisease as a factor and replaced the existing column with the factorized one, and finally removed ST_Slope from the tibble. </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>heart_data <span class="ot">&lt;-</span> heart_data <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Cholesterol <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">HeartDisease =</span> <span class="fu">as.factor</span>(HeartDisease)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>ST_Slope)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(heart_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 746 × 11
+     Age Sex   ChestPainType RestingBP Cholesterol FastingBS RestingECG MaxHR
+   &lt;int&gt; &lt;chr&gt; &lt;chr&gt;             &lt;int&gt;       &lt;int&gt;     &lt;int&gt; &lt;chr&gt;      &lt;int&gt;
+ 1    40 M     ATA                 140         289         0 Normal       172
+ 2    49 F     NAP                 160         180         0 Normal       156
+ 3    37 M     ATA                 130         283         0 ST            98
+ 4    48 F     ASY                 138         214         0 Normal       108
+ 5    54 M     NAP                 150         195         0 Normal       122
+ 6    39 M     NAP                 120         339         0 Normal       170
+ 7    45 F     ATA                 130         237         0 Normal       170
+ 8    54 M     ATA                 110         208         0 Normal       142
+ 9    37 M     ASY                 140         207         0 Normal       130
+10    48 F     ATA                 120         284         0 Normal       120
+# ℹ 736 more rows
+# ℹ 3 more variables: ExerciseAngina &lt;chr&gt;, Oldpeak &lt;dbl&gt;, HeartDisease &lt;fct&gt;</code></pre>
+</div>
+</div>
+<p><em>3. We’ll be doing a kNN model below to predict whether or not someone has heart disease. To use kNN we generally want to have all numeric predictors (although we could try to create our own loss function as an alternative). In this case we have some categorical predictors still in our data set: Sex, ExerciseAngina ChestPainType, and RestingECG.</em><br>
 <strong>Create dummy columns corresponding to the values of these three variables for use in our kNN fit.</strong> <em>The caret vignette has a function to help us out here. You should use dummyVars() and predict() to create new columns. Then</em> <strong>add these columns to our data frame.</strong><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Created a dummy object `dmy` with the columns that I want to "dummify".</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dmy <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="st">"~ Sex + ChestPainType + RestingECG + ExerciseAngina"</span>, heart_data)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Create a predict_heartdata object to hold the predicted dmy values for adding to the main tibble. </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>pred_hd <span class="ot">&lt;-</span> <span class="fu">predict</span>(dmy, heart_data)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Adding the predicted values to the table while removed their non-predictive variants. </span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>heart_data <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  heart_data <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="sc">-</span>Sex, <span class="sc">-</span>ExerciseAngina, <span class="sc">-</span>ChestPainType, <span class="sc">-</span>RestingECG), pred_hd)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(heart_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 746 × 18
+     Age RestingBP Cholesterol FastingBS MaxHR Oldpeak HeartDisease  SexF  SexM
+   &lt;int&gt;     &lt;int&gt;       &lt;int&gt;     &lt;int&gt; &lt;int&gt;   &lt;dbl&gt; &lt;fct&gt;        &lt;dbl&gt; &lt;dbl&gt;
+ 1    40       140         289         0   172     0   0                0     1
+ 2    49       160         180         0   156     1   1                1     0
+ 3    37       130         283         0    98     0   0                0     1
+ 4    48       138         214         0   108     1.5 1                1     0
+ 5    54       150         195         0   122     0   0                0     1
+ 6    39       120         339         0   170     0   0                0     1
+ 7    45       130         237         0   170     0   0                1     0
+ 8    54       110         208         0   142     0   0                0     1
+ 9    37       140         207         0   130     1.5 1                0     1
+10    48       120         284         0   120     0   0                1     0
+# ℹ 736 more rows
+# ℹ 9 more variables: ChestPainTypeASY &lt;dbl&gt;, ChestPainTypeATA &lt;dbl&gt;,
+#   ChestPainTypeNAP &lt;dbl&gt;, ChestPainTypeTA &lt;dbl&gt;, RestingECGLVH &lt;dbl&gt;,
+#   RestingECGNormal &lt;dbl&gt;, RestingECGST &lt;dbl&gt;, ExerciseAnginaN &lt;dbl&gt;,
+#   ExerciseAnginaY &lt;dbl&gt;</code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="split-your-data" class="level2">
 <h2 class="anchored" data-anchor-id="split-your-data">Split your Data</h2>
 <p><strong>Split your data into a training and test set.</strong> <em>(Ideally you’d do this prior to the EDA so that info from the EDA doesn’t bias what you do modeling-wise, but that isn’t usually done.)</em><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Reproducibility.</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Split on HeartDisease, by 70:30 ratio. Object name describes which split is which. </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>heart_split <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(heart_data<span class="sc">$</span>HeartDisease, <span class="at">p =</span> <span class="fl">0.7</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>heart_train <span class="ot">&lt;-</span> heart_data[heart_split, ]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>heart_test <span class="ot">&lt;-</span> heart_data[<span class="sc">-</span>heart_split, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="knn" class="level2">
 <h2 class="anchored" data-anchor-id="knn">kNN</h2>
@@ -107,33 +309,844 @@ ul.task-list li input[type="checkbox"] {
 </p>
 <p><strong>Train the kNN model.</strong> <em>Use repeated 10 fold cross-validation, with the number of repeats being 3. You should also preprocess the data by centering and scaling. When fitting the model, set the tuneGrid so that you are considering values of k of 1, 2, 3, . . . , 40. (Note: From the help for the train() function it says: tuneGrid A data frame with possible tuning values. The columns are named the same as the tuning parameters. The name of the tuning parameter here is k.)</em><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#built-in caret function to control the training computations.  Ten-Fold cross validation is used with three repeats. </span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>trainCTRL <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>);</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#hyperparameter Tuning </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>tuneGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">40</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#The substance of the kNN model with reproducibility and center/scaling. </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>heartData_knn_model <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  HeartDisease <span class="sc">~</span> Age <span class="sc">+</span> Cholesterol,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  heart_train, </span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(heartData_knn_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>k-Nearest Neighbors 
+
+523 samples
+  2 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (2), scaled (2) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  k   Accuracy   Kappa     
+   1  0.5329221  0.06324044
+   2  0.5597242  0.11823594
+   3  0.5629415  0.12363517
+   4  0.5629052  0.12469367
+   5  0.5703677  0.14052297
+   6  0.5984156  0.19676275
+   7  0.5985123  0.19762148
+   8  0.6016570  0.20418402
+   9  0.6112361  0.22387650
+  10  0.6156991  0.23136246
+  11  0.6126149  0.22547391
+  12  0.6092525  0.21750064
+  13  0.6182269  0.23588711
+  14  0.6118529  0.22294697
+  15  0.6220972  0.24383373
+  16  0.6234277  0.24708692
+  17  0.6258829  0.25103848
+  18  0.6265965  0.25261461
+  19  0.6208394  0.24090319
+  20  0.6195210  0.23849886
+  21  0.6220851  0.24399254
+  22  0.6264998  0.25239692
+  23  0.6291001  0.25777563
+  24  0.6309869  0.26086611
+  25  0.6310353  0.26097367
+  26  0.6354378  0.26997172
+  27  0.6335631  0.26575918
+  28  0.6303701  0.25972044
+  29  0.6328979  0.26483949
+  30  0.6399371  0.27982576
+  31  0.6450774  0.28968578
+  32  0.6443638  0.28826772
+  33  0.6488268  0.29755142
+  34  0.6513788  0.30237272
+  35  0.6571118  0.31359208
+  36  0.6514272  0.30233526
+  37  0.6495041  0.29855678
+  38  0.6436986  0.28713567
+  39  0.6552129  0.31005380
+  40  0.6481979  0.29595141
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was k = 35.</code></pre>
+</div>
+</div>
 <p><strong>Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.</strong><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>heart_test_predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(heartData_knn_model, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>ConfMtrx <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(heart_test_predictions, heart_test<span class="sc">$</span>HeartDisease)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>ConfMtrx</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 73 42
+         1 44 64
+                                         
+               Accuracy : 0.6143         
+                 95% CI : (0.547, 0.6786)
+    No Information Rate : 0.5247         
+    P-Value [Acc &gt; NIR] : 0.004305       
+                                         
+                  Kappa : 0.2275         
+                                         
+ Mcnemar's Test P-Value : 0.914128       
+                                         
+            Sensitivity : 0.6239         
+            Specificity : 0.6038         
+         Pos Pred Value : 0.6348         
+         Neg Pred Value : 0.5926         
+             Prevalence : 0.5247         
+         Detection Rate : 0.3274         
+   Detection Prevalence : 0.5157         
+      Balanced Accuracy : 0.6139         
+                                         
+       'Positive' Class : 0              
+                                         </code></pre>
+</div>
+</div>
+<p>Mainly interested in the accuracy = 0.6143. That is from the reference matrix (73 + 64)/223. The diagonal divided by the sum of the entire matrix.</p>
 </section>
 <section id="logistic-regression" class="level2">
 <h2 class="anchored" data-anchor-id="logistic-regression">Logistic Regression</h2>
-<p><strong>Using your EDA, posit three different logistic regression models.</strong> <em>Note: You don’t have to use the dummy columns you made here as the glm() function (and the caret implementation of it) can handle factor/character variables as predictors.</em><br>
-<strong>Fit those models on the training set, using repeated CV as done above.</strong> <em>You can preprocess the data or not, up to you.</em><br>
-<strong>Identify your best model and provide a basic summary of it.</strong><br>
-<strong>Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.</strong><br>
+<p><strong>Using your EDA, posit three different logistic regression models.</strong> <em>Note: You don’t have to use the dummy columns you made here as the glm() function (and the caret implementation of it) can handle factor/character variables as predictors.</em><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Model with the non-binary variables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>model1 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> Age <span class="sc">+</span> SexF <span class="sc">+</span> SexM <span class="sc">+</span> Cholesterol <span class="sc">+</span> RestingBP</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Model with some non-binary variables thrown together</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> Age <span class="sc">+</span> SexF <span class="sc">+</span> SexM <span class="sc">+</span> Cholesterol <span class="sc">+</span> ExerciseAnginaN <span class="sc">+</span> ExerciseAnginaY <span class="sc">+</span> FastingBS</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Model using all variables</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>model3 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> .</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Fit those models on the training set, using repeated CV as done above.</strong> <em>You can preprocess the data or not, up to you.</em><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>model1_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  model1,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  heart_train, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>model2_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  model2,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  heart_train, </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>model3_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  model3,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  heart_train, </span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract resamples into a list</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(<span class="at">model1 =</span> model1_train, <span class="at">model2 =</span> model2_train, <span class="at">model3 =</span> model3_train))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+resamples.default(x = list(model1 = model1_train, model2 = model2_train,
+ model3 = model3_train))
+
+Models: model1, model2, model3 
+Number of resamples: 30 
+Performance metrics: Accuracy, Kappa 
+Time estimates for: everything, final model fit </code></pre>
+</div>
+</div>
+<p><strong>Identify your best model and provide a basic summary of it.</strong><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize the results</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>results_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(results)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(results_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+summary.resamples(object = results)
+
+Models: model1, model2, model3 
+Number of resamples: 30 
+
+Accuracy 
+            Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+model1 0.5769231 0.6346154 0.6826923 0.6947388 0.7500000 0.8461538    0
+model2 0.6153846 0.7393868 0.7692308 0.7667392 0.7884615 0.8846154    0
+model3 0.6346154 0.7894594 0.8269231 0.8215893 0.8672896 0.9230769    0
+
+Kappa 
+            Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
+model1 0.1398496 0.2681433 0.3667441 0.3881459 0.5000000 0.6936672    0
+model2 0.2133132 0.4750450 0.5350224 0.5287619 0.5753519 0.7675112    0
+model3 0.2648810 0.5774200 0.6523024 0.6421745 0.7337140 0.8454681    0</code></pre>
+</div>
+</div>
+<p><strong>Lastly, check how well your chosen model does on the test set using the confusionMatrix() function.</strong><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract accuracies</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>model_accuracies <span class="ot">&lt;-</span> results_summary<span class="sc">$</span>statistics<span class="sc">$</span>Accuracy[, <span class="st">"Mean"</span>]</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify the best model</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>best_model_name <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which.max</span>(model_accuracies))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Best model:"</span>, best_model_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Best model: model3"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve the best model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>best_model_train <span class="ot">&lt;-</span> <span class="fu">get</span>(<span class="fu">paste0</span>(best_model_name, <span class="st">"_train"</span>))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(best_model_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>k-Nearest Neighbors 
+
+523 samples
+ 17 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (17), scaled (17) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  k   Accuracy   Kappa    
+   1  0.7756531  0.5494992
+   2  0.7604257  0.5192619
+   3  0.8036647  0.6057501
+   4  0.8125907  0.6238228
+   5  0.8215893  0.6421745
+   6  0.8088534  0.6168747
+   7  0.8062772  0.6116055
+   8  0.8095307  0.6180411
+   9  0.8024673  0.6038485
+  10  0.8043541  0.6073807
+  11  0.8043662  0.6077426
+  12  0.8075593  0.6140501
+  13  0.8018626  0.6026277
+  14  0.7980406  0.5950520
+  15  0.7999516  0.5989053
+  16  0.7960813  0.5910060
+  17  0.8030842  0.6050177
+  18  0.8036768  0.6063192
+  19  0.7980044  0.5946424
+  20  0.8005806  0.5997167
+  21  0.7967223  0.5919702
+  22  0.8024673  0.6035206
+  23  0.7947992  0.5880391
+  24  0.7954765  0.5895748
+  25  0.7935414  0.5855550
+  26  0.8005806  0.5996907
+  27  0.7954765  0.5895183
+  28  0.7987059  0.5960288
+  29  0.7986575  0.5960733
+  30  0.8018868  0.6028120
+  31  0.7986817  0.5963794
+  32  0.7986696  0.5962821
+  33  0.7955007  0.5900747
+  34  0.7910377  0.5813189
+  35  0.7923198  0.5838908
+  36  0.7974117  0.5940047
+  37  0.7980285  0.5953016
+  38  0.8031688  0.6055957
+  39  0.7993469  0.5978469
+  40  0.8000121  0.5992568
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was k = 5.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the best model on the test set</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(best_model_train, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predictions, heart_test<span class="sc">$</span>HeartDisease)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(conf_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 98 27
+         1 19 79
+                                          
+               Accuracy : 0.7937          
+                 95% CI : (0.7346, 0.8448)
+    No Information Rate : 0.5247          
+    P-Value [Acc &gt; NIR] : &lt;2e-16          
+                                          
+                  Kappa : 0.585           
+                                          
+ Mcnemar's Test P-Value : 0.302           
+                                          
+            Sensitivity : 0.8376          
+            Specificity : 0.7453          
+         Pos Pred Value : 0.7840          
+         Neg Pred Value : 0.8061          
+             Prevalence : 0.5247          
+         Detection Rate : 0.4395          
+   Detection Prevalence : 0.5605          
+      Balanced Accuracy : 0.7914          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+</div>
 </section>
 <section id="tree-models" class="level2">
 <h2 class="anchored" data-anchor-id="tree-models">Tree Models</h2>
 <p><em>In this section we’ll fit a few different tree based models in a similar way as above!</em><br>
 </p>
 <p><strong>Choose your own variables of interest (as with logistic regression, this models can accept factor/character variables as predictors). Use repeated 10 fold CV to select a best:</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#I was not sure if we were supposed to choose the best model from earlier, one of the other models from earlier or select a new sets of independent variables hypothesized to explain most of what makes up this model; so I chose to assume the . </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>model4 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> Age <span class="sc">+</span> SexF <span class="sc">+</span> SexM <span class="sc">+</span> Cholesterol <span class="sc">+</span> RestingBP</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>model5 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> FastingBS <span class="sc">+</span> ChestPainTypeATA <span class="sc">+</span> ChestPainTypeNAP <span class="sc">+</span> ChestPainTypeASY <span class="sc">+</span> ChestPainTypeTA</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>model6 <span class="ot">&lt;-</span> HeartDisease <span class="sc">~</span> RestingECGNormal <span class="sc">+</span> RestingECGST <span class="sc">+</span> RestingECGLVH <span class="sc">+</span> Cholesterol</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#built-in caret function to control the training computations.  Ten-Fold cross validation is used with three repeats. </span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>trainCTRL <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>);</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#hyperparameter Tuning </span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>tuneGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">k =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">40</span>)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">#Using the trainCTRL and tuneGrid objects to replicate the same environment to training model4 as I did model1-model3.</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>model4_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  model4,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train, </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>model5_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  model5,</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train, </span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>model6_train <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>  model6,</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train, </span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"knn"</span>,</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGrid,</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract samples from models 4,5 and 6 and add them to the existing list of models sampled. </span></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(<span class="at">model4 =</span> model4_train, <span class="at">model5 =</span> model5_train, <span class="at">model6 =</span> model6_train))</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize the results</span></span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>results_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(results)</span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract accuracies</span></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>model_accuracies <span class="ot">&lt;-</span> results_summary<span class="sc">$</span>statistics<span class="sc">$</span>Accuracy[, <span class="st">"Mean"</span>]</span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Identify the best model</span></span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>best_model_name <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which.max</span>(model_accuracies))</span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Best model:"</span>, best_model_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Best model: model5"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Retrieve the best model</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>best_model_train <span class="ot">&lt;-</span> <span class="fu">get</span>(<span class="fu">paste0</span>(best_model_name, <span class="st">"_train"</span>))</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(best_model_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>k-Nearest Neighbors 
+
+523 samples
+  5 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (5), scaled (5) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  k   Accuracy   Kappa    
+   1  0.7796323  0.5595132
+   2  0.7796323  0.5595132
+   3  0.7802733  0.5608065
+   4  0.7796323  0.5595132
+   5  0.7789913  0.5582161
+   6  0.7764514  0.5526786
+   7  0.7764514  0.5526786
+   8  0.7764514  0.5526786
+   9  0.7764514  0.5526786
+  10  0.7764514  0.5526786
+  11  0.7764514  0.5526786
+  12  0.7764514  0.5526786
+  13  0.7764514  0.5526786
+  14  0.7764514  0.5526786
+  15  0.7764514  0.5526786
+  16  0.7764514  0.5526786
+  17  0.7758104  0.5514198
+  18  0.7758104  0.5514889
+  19  0.7751693  0.5502331
+  20  0.7745283  0.5489119
+  21  0.7745283  0.5489119
+  22  0.7751693  0.5501640
+  23  0.7738873  0.5481460
+  24  0.7726294  0.5461804
+  25  0.7732946  0.5480020
+  26  0.7707547  0.5434724
+  27  0.7707426  0.5434988
+  28  0.7707426  0.5434988
+  29  0.7707426  0.5434988
+  30  0.7707426  0.5434988
+  31  0.7707426  0.5434988
+  32  0.7707426  0.5434988
+  33  0.7707426  0.5434988
+  34  0.7707426  0.5434988
+  35  0.7707426  0.5434988
+  36  0.7707426  0.5434988
+  37  0.7707426  0.5434988
+  38  0.7707426  0.5434988
+  39  0.7707426  0.5434988
+  40  0.7707426  0.5434988
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was k = 3.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the best model on the test set</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(best_model_train, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>conf_matrix <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predictions, heart_test<span class="sc">$</span>HeartDisease)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(conf_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 82 28
+         1 35 78
+                                          
+               Accuracy : 0.7175          
+                 95% CI : (0.6535, 0.7756)
+    No Information Rate : 0.5247          
+    P-Value [Acc &gt; NIR] : 3.159e-09       
+                                          
+                  Kappa : 0.4354          
+                                          
+ Mcnemar's Test P-Value : 0.4497          
+                                          
+            Sensitivity : 0.7009          
+            Specificity : 0.7358          
+         Pos Pred Value : 0.7455          
+         Neg Pred Value : 0.6903          
+             Prevalence : 0.5247          
+         Detection Rate : 0.3677          
+   Detection Prevalence : 0.4933          
+      Balanced Accuracy : 0.7184          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+</div>
+<p>Based on the results we are still going to move forward with Model #5 as the best model to use for the subsequent tree modeling.</p>
 <p><strong>• classification tree model</strong> <em>(use method = rpart: tuning parameter is cp, use values 0, 0.001, 0.002, . . . ,0.1)</em><br>
-<strong>• a random forest</strong> <em>(use method = rf: tuning parameter is mtry, use values of 1, 2, . . . , # of predictors (bagging is a special case here!)</em><br>
-<strong>• a boosted tree</strong> <em>(use method = gbm: tuning parameters are n.trees, interaction.depth, shrinkage, and n.minobsinnode, use all combinations of n.trees of 25, 50, 100, and 200, interaction.depth of 1, 2, 3, shrinkage = 0.1, and nminobsinnode = 10; Hint: use expand.grid() to create your data frame for tuneGrid and verbose = FALSE limits the output produced.</em><br>
 </p>
-<p><strong>Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function.</strong><br>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Using the example in the slides as a resource, I used the original heart_data to fitTree.  Was not sure we were supposed to use the best model from earlier.  Noticed that the slides used the original dataset and not the modeling sets.  Apologies, this section was a little more confusing for me than earlier assignments. </span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#This handles the intructions of method and tuning parameter to be used in the training</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>tuneGridClass <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">cp =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="fl">0.1</span>, <span class="at">by =</span> <span class="fl">0.001</span>))</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#training the model</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>classification_tree <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  model5,</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train,</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"rpart"</span>,</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGridClass,</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(classification_tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CART 
+
+523 samples
+  5 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (5), scaled (5) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  cp     Accuracy   Kappa    
+  0.000  0.7764514  0.5526786
+  0.001  0.7764514  0.5526786
+  0.002  0.7764514  0.5526786
+  0.003  0.7764514  0.5526786
+  0.004  0.7764514  0.5526786
+  0.005  0.7764514  0.5526786
+  0.006  0.7764514  0.5526786
+  0.007  0.7764514  0.5526786
+  0.008  0.7764514  0.5526786
+  0.009  0.7764514  0.5526786
+  0.010  0.7764514  0.5526786
+  0.011  0.7764514  0.5526786
+  0.012  0.7764514  0.5526786
+  0.013  0.7764514  0.5526786
+  0.014  0.7764514  0.5526786
+  0.015  0.7764514  0.5526786
+  0.016  0.7764514  0.5526786
+  0.017  0.7764514  0.5526786
+  0.018  0.7764514  0.5526786
+  0.019  0.7764514  0.5526786
+  0.020  0.7764514  0.5526786
+  0.021  0.7764514  0.5526786
+  0.022  0.7764514  0.5526786
+  0.023  0.7764514  0.5526786
+  0.024  0.7764514  0.5526786
+  0.025  0.7764514  0.5526786
+  0.026  0.7764514  0.5526786
+  0.027  0.7764514  0.5526786
+  0.028  0.7764514  0.5526786
+  0.029  0.7764514  0.5526786
+  0.030  0.7764514  0.5526786
+  0.031  0.7764514  0.5526786
+  0.032  0.7764514  0.5526786
+  0.033  0.7764514  0.5526786
+  0.034  0.7764514  0.5526786
+  0.035  0.7764514  0.5526786
+  0.036  0.7764514  0.5526786
+  0.037  0.7764514  0.5526786
+  0.038  0.7764514  0.5526786
+  0.039  0.7764514  0.5526786
+  0.040  0.7764514  0.5526786
+  0.041  0.7764514  0.5526786
+  0.042  0.7764514  0.5526786
+  0.043  0.7764514  0.5526786
+  0.044  0.7764514  0.5526786
+  0.045  0.7764514  0.5526786
+  0.046  0.7764514  0.5526786
+  0.047  0.7764514  0.5526786
+  0.048  0.7764514  0.5526786
+  0.049  0.7764514  0.5526786
+  0.050  0.7764514  0.5526786
+  0.051  0.7764514  0.5526786
+  0.052  0.7764514  0.5526786
+  0.053  0.7764514  0.5526786
+  0.054  0.7764514  0.5526786
+  0.055  0.7764514  0.5526786
+  0.056  0.7764514  0.5526786
+  0.057  0.7764514  0.5526786
+  0.058  0.7764514  0.5526786
+  0.059  0.7764514  0.5526786
+  0.060  0.7764514  0.5526786
+  0.061  0.7764514  0.5526786
+  0.062  0.7764514  0.5526786
+  0.063  0.7764514  0.5526786
+  0.064  0.7764514  0.5526786
+  0.065  0.7764514  0.5526786
+  0.066  0.7764514  0.5526786
+  0.067  0.7764514  0.5526786
+  0.068  0.7764514  0.5526786
+  0.069  0.7764514  0.5526786
+  0.070  0.7764514  0.5526786
+  0.071  0.7764514  0.5526786
+  0.072  0.7764514  0.5526786
+  0.073  0.7764514  0.5526786
+  0.074  0.7764514  0.5526786
+  0.075  0.7764514  0.5526786
+  0.076  0.7764514  0.5526786
+  0.077  0.7764514  0.5526786
+  0.078  0.7764514  0.5526786
+  0.079  0.7764514  0.5526786
+  0.080  0.7764514  0.5526786
+  0.081  0.7764514  0.5526786
+  0.082  0.7764514  0.5526786
+  0.083  0.7764514  0.5526786
+  0.084  0.7764514  0.5526786
+  0.085  0.7764514  0.5526786
+  0.086  0.7764514  0.5526786
+  0.087  0.7764514  0.5526786
+  0.088  0.7764514  0.5526786
+  0.089  0.7764514  0.5526786
+  0.090  0.7764514  0.5526786
+  0.091  0.7764514  0.5526786
+  0.092  0.7764514  0.5526786
+  0.093  0.7764514  0.5526786
+  0.094  0.7764514  0.5526786
+  0.095  0.7764514  0.5526786
+  0.096  0.7764514  0.5526786
+  0.097  0.7764514  0.5526786
+  0.098  0.7764514  0.5526786
+  0.099  0.7764514  0.5526786
+  0.100  0.7764514  0.5526786
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was cp = 0.1.</code></pre>
+</div>
+</div>
+<p><strong>• a random forest</strong> <em>(use method = rf: tuning parameter is mtry, use values of 1, 2, . . . , # of predictors (bagging is a special case here!)</em><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up empty var for tuning.</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>num_predictors <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">all.vars</span>(model5)) <span class="sc">-</span> <span class="dv">1</span>  </span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># New Tuning for this tree fit</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>tuneGridRando <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">mtry =</span> <span class="dv">1</span><span class="sc">:</span>num_predictors)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>random_forest <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  model5,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"rf"</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGridRando,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(random_forest)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Random Forest 
+
+523 samples
+  5 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (5), scaled (5) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  mtry  Accuracy   Kappa    
+  1     0.7745283  0.5490890
+  2     0.7732583  0.5464946
+  3     0.7777334  0.5556331
+  4     0.7789913  0.5582161
+  5     0.7789913  0.5582161
+
+Accuracy was used to select the optimal model using the largest value.
+The final value used for the model was mtry = 4.</code></pre>
+</div>
+</div>
+<p><strong>• a boosted tree</strong> <em>(use method = gbm: tuning parameters are n.trees, interaction.depth, shrinkage, and n.minobsinnode, use all combinations of n.trees of 25, 50, 100, and 200, interaction.depth of 1, 2, 3, shrinkage = 0.1, and nminobsinnode = 10; Hint: use expand.grid() to create your data frame for tuneGrid and verbose = FALSE limits the output produced.</em><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the train control for cross-validation</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>trainCTRL <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"repeatedcv"</span>, <span class="at">number =</span> <span class="dv">10</span>, <span class="at">repeats =</span> <span class="dv">3</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the tuning grid for the boosted tree</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>tuneGridBoosted <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n.trees =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>),</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">interaction.depth =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">shrinkage =</span> <span class="fl">0.1</span>,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">n.minobsinnode =</span> <span class="dv">10</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Train the boosted tree model using caret</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>boosted_tree <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  model5,</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> heart_train,</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"gbm"</span>,</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">trControl =</span> trainCTRL,</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">tuneGrid =</span> tuneGridBoosted,</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"scale"</span>),</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the model summary to check the best parameters</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(boosted_tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Stochastic Gradient Boosting 
+
+523 samples
+  5 predictor
+  2 classes: '0', '1' 
+
+Pre-processing: centered (5), scaled (5) 
+Resampling: Cross-Validated (10 fold, repeated 3 times) 
+Summary of sample sizes: 471, 471, 470, 470, 470, 471, ... 
+Resampling results across tuning parameters:
+
+  interaction.depth  n.trees  Accuracy   Kappa    
+  1                   25      0.7764514  0.5526786
+  1                   50      0.7789913  0.5581773
+  1                  100      0.7764393  0.5533593
+  1                  200      0.7796444  0.5595999
+  2                   25      0.7790034  0.5582189
+  2                   50      0.7802733  0.5608065
+  2                  100      0.7802733  0.5608065
+  2                  200      0.7802733  0.5608065
+  3                   25      0.7796323  0.5595093
+  3                   50      0.7789913  0.5582991
+  3                  100      0.7802733  0.5608065
+  3                  200      0.7802733  0.5608065
+
+Tuning parameter 'shrinkage' was held constant at a value of 0.1
+
+Tuning parameter 'n.minobsinnode' was held constant at a value of 10
+Accuracy was used to select the optimal model using the largest value.
+The final values used for the model were n.trees = 50, interaction.depth =
+ 2, shrinkage = 0.1 and n.minobsinnode = 10.</code></pre>
+</div>
+</div>
+<p><strong>Lastly, check how well each of your chosen models do on the test set using the confusionMatrix() function</strong><br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test set predictions</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>pred_tree <span class="ot">&lt;-</span> <span class="fu">predict</span>(classification_tree, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>pred_rf <span class="ot">&lt;-</span> <span class="fu">predict</span>(random_forest, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>pred_boosted <span class="ot">&lt;-</span> <span class="fu">predict</span>(boosted_tree, <span class="at">newdata =</span> heart_test)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Confusion matrices</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>conf_matrix_tree <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_tree, heart_test<span class="sc">$</span>HeartDisease); <span class="fu">print</span>(conf_matrix_tree)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 85 29
+         1 32 77
+                                          
+               Accuracy : 0.7265          
+                 95% CI : (0.6629, 0.7838)
+    No Information Rate : 0.5247          
+    P-Value [Acc &gt; NIR] : 5.586e-10       
+                                          
+                  Kappa : 0.4523          
+                                          
+ Mcnemar's Test P-Value : 0.7979          
+                                          
+            Sensitivity : 0.7265          
+            Specificity : 0.7264          
+         Pos Pred Value : 0.7456          
+         Neg Pred Value : 0.7064          
+             Prevalence : 0.5247          
+         Detection Rate : 0.3812          
+   Detection Prevalence : 0.5112          
+      Balanced Accuracy : 0.7265          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>conf_matrix_rf <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_rf, heart_test<span class="sc">$</span>HeartDisease); <span class="fu">print</span>(conf_matrix_rf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 82 28
+         1 35 78
+                                          
+               Accuracy : 0.7175          
+                 95% CI : (0.6535, 0.7756)
+    No Information Rate : 0.5247          
+    P-Value [Acc &gt; NIR] : 3.159e-09       
+                                          
+                  Kappa : 0.4354          
+                                          
+ Mcnemar's Test P-Value : 0.4497          
+                                          
+            Sensitivity : 0.7009          
+            Specificity : 0.7358          
+         Pos Pred Value : 0.7455          
+         Neg Pred Value : 0.6903          
+             Prevalence : 0.5247          
+         Detection Rate : 0.3677          
+   Detection Prevalence : 0.4933          
+      Balanced Accuracy : 0.7184          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>conf_matrix_boosted <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_boosted, heart_test<span class="sc">$</span>HeartDisease); <span class="fu">print</span>(conf_matrix_boosted)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction  0  1
+         0 82 28
+         1 35 78
+                                          
+               Accuracy : 0.7175          
+                 95% CI : (0.6535, 0.7756)
+    No Information Rate : 0.5247          
+    P-Value [Acc &gt; NIR] : 3.159e-09       
+                                          
+                  Kappa : 0.4354          
+                                          
+ Mcnemar's Test P-Value : 0.4497          
+                                          
+            Sensitivity : 0.7009          
+            Specificity : 0.7358          
+         Pos Pred Value : 0.7455          
+         Neg Pred Value : 0.6903          
+             Prevalence : 0.5247          
+         Detection Rate : 0.3677          
+   Detection Prevalence : 0.4933          
+      Balanced Accuracy : 0.7184          
+                                          
+       'Positive' Class : 0               
+                                          </code></pre>
+</div>
+</div>
 </section>
 <section id="wrap-up" class="level2">
 <h2 class="anchored" data-anchor-id="wrap-up">Wrap up</h2>
 <p><strong>Which model overall did the best job (in terms of accuracy) on the test set?</strong><br>
 </p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract balanced accuracy from each confusion matrix</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>balanced_accuracy_tree <span class="ot">&lt;-</span> conf_matrix_tree<span class="sc">$</span>byClass[<span class="dv">11</span>]</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>balanced_accuracy_rf <span class="ot">&lt;-</span> conf_matrix_rf<span class="sc">$</span>byClass[<span class="dv">11</span>]</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>balanced_accuracy_boosted <span class="ot">&lt;-</span> conf_matrix_boosted<span class="sc">$</span>byClass[<span class="dv">11</span>]</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame to summarize the results</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>balanced_accuracy_summary <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"Classification Tree"</span>, <span class="st">"Random Forest"</span>, <span class="st">"Boosted Tree"</span>),</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">Balanced_Accuracy =</span> <span class="fu">c</span>(balanced_accuracy_tree, balanced_accuracy_rf, balanced_accuracy_boosted)</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the summary data frame</span></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(balanced_accuracy_summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Model Balanced_Accuracy
+1 Classification Tree         0.7264554
+2       Random Forest         0.7183519
+3        Boosted Tree         0.7183519</code></pre>
+</div>
+</div>
+<p>On accuracy alone the classification tree model for model5 outperformed the boosted tree and the random forest tree.</p>
 </section>
 
 </main>
